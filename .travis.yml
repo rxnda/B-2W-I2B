@@ -1,7 +1,34 @@
----
+sudo: required
+services:
+- docker
 language: node_js
 node_js: node
-sudo: false
 script:
 - make lint
 - make critique
+before_deploy:
+- curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+- sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu
+  $(lsb_release -cs) stable"
+- sudo apt-get update
+- sudo apt-get -y install docker-ce
+- make docker
+deploy:
+- provider: script
+  script: make google-drive
+  skip_cleanup: true
+  on:
+    tags: true
+- provider: releases
+  api_key:
+    secure: rwsI1rofiAWsgu3TMwWgevn8dzm0L+cbD8x9rqA60SdoLTVnJ56d9YEhz/L+7VpqsMnuEnWpTncvqCqD6JDGriIF5NQ7Do9asSxWjR+WJh6bbysToWhk5JbJCOE4YFpuiy2Z/S5JC4neoDz7lChrJossfDuqYYRC8A7zyZXJ1dWSHOOdn2Hib1Ba4vPxZMxBSnOaZq83UpZd5PeUwNI/1k0lsmnMMqgsMAyBwkLZch86xOfVtSAXJJHxyw1OWG/VXPwtIAvYcMloh+qgdWhfgdfu5TPPVkPqDjPMM388Sw0uXoM84CVQ/laEStd3wYXgH+vf/jLGAaWoXv4ujXJr8VYczh5n17WV7NMPmyslyyEuP7qM4dDvaI5MO1pWMaSufXm4yHvHqX7lOp5RlrWspt0MT82Fi3HOdKhVpYeM0ih2m4/sqyx4/dJ1ce9E+S0expD+2Gz59apV9S8UgxTuFKm0204EfvgKVlrf1jbM/Oe/9fl8OgScCzEhJRXlJxYacSkfioMmmyra1Y/aSsqEtpqzvA7PvFn/C7az/vf5IMwkQS3QwcItwUoSQoMfYUq8xyyV7jQWV5KSyDoSVluWJ9PiRxaUeYlX6t+vLGtsZuHEE8ZIeWRODSN6CVwg+Z8571HFEcrkVqSBz3aZ04bx8+j8VQfh5mzwt1WhYMzpbFY=
+  skip_cleanup: true
+  file_glob: true
+  file: build/*
+  on:
+    tags: true
+env:
+  global:
+  - secure: kKoj2V2lgJAuwbv9B2WfHTO/S2sWJodVbBu1zeQzFAtIG+8UIuky67y+bVJxosMKcWqVJF+f67CHL/HFR4HArRDQgqVnodg0sLl24F2cmh4C5hJL9FXF1WBGhneZlurGhZPhwo0cAzXuAY4uCOnrKbIL3d+C6LUoFG8W5+ir6xEGwEVvp5lsbdFoANEcL7bJQDzMBTIZdC8EEEhVny2NHQMLVaNqHPH2NZGSppifpOBseEg4yGJbv1tHzJla4ld5nUfpINtyG4WxSNeNSZuUkzTC/9KO7IJz3WpT6ie5NYJYHy+ev3d2kriEz7oIXVx3z2Rp7vzv2r5OqmjpzrH5rQDOklfLo4cOcxTBAYTFZ+t3berX50V6UdYp8IGkOC8XLNH95swxqnUUa6O3ljctME58E/0bbp61qzwTY3pD2kMuFhxghTr+4uqF4yB+u7CdTpmjuVJIMLh49ETiqVVcR+t/+ZUmOBqH9iOwN519aQFSfI2NPvkdVDJND/yKt9XMd+WAxfbBdyLc7+04/Y0LTsx16mefqM39JB9/TRLj06yHbZ6jyxx/QuQ06RzeTI4suIRIHQfQe7+OhZVXl1Xv+oQrj8Z0f7PpBSjVCKXSRaO0PVVfbwRGqbbDwFZNq5GophSkNBhPI9o20svjGyPIC+96BHjyLzWxXXDCdNeCQFI=
+  - secure: OdGpU4tYIxKvvhWBHrRzO5hO80Y7axpvc/P44YI3gDd1e26iu2w6/U+Y+gUfSrju+3yW8CdR3nHtl/pUNabR9EGND3ft0vPjd326d2jm7G+rY0/OrO/kNNJgzq60rKj95TOJRc6WxA2v40AVWUPZsnmmSF0cqx6N9cmBlPfoeXpH+6OLvIo5zvQ4gNzccj/CwQt2Nfx8T+GYmlca1MeaIarEBGQPA7uQxKvKEQXWn39DsJfyA73YIxix7Zgv/sYNgKVSTQAak8I6DyWUtU6THabUzng3+zioGQXV1Du3oz5ltesV53FcVljouaSgHa+3VqJ6GZoMstlj+SkjH1/A2Tv8gU8E+xvh6dOqRVoPWEXqHL7RA/xnmkvRG6UvaNVr5MBff0aLbqwBm5c2hORREO6np11IAgKk4C7szo01L1EVpge0KwyEr90ZCJhp45qW67bbxKVIF1MTbE8uXZylI4xZ+8xteUtaGPnezqOZlX68VfyWEZZtO5pYhMi32+yEHta82MORR7sIsBXKhz5R60t1HydqW4HFPPl4lVZCt9xnEwEvZPf/C9OPX0YiZxP6Adkr33mND1HcQJcK/3qFIHtzNP8VMBoon0ztSqUuaRl4yFLTnBysMbH+4Bu/5AJgW/mu089xdJwb7zlDAMfvHBXF3yBkRHO64mvUyehLcsI=
+  - secure: P9WHGbyrYZwaMOM84GoTWP0Somm6TZ7pkIKZqhXhJ1pH3ANqVg5Y/Fqj+Gc2foTWaMqkZLoDlgFzeX5dvB/RH1DJryQRB0MR8QyUD5jQzoNkk6aLLFp8objDrsVHrpi0QB/1fCe4XOdw5CF+dhKwvtKVwUEv4WtaYnyVM7Z+EO6W9GSjEe7YJq0O3x0BKA5AB5SlEdarLrx5EnJUxoa+2SMcGVWa27FLgDnyV6BeValNWEoFFn+RDplQcJoWlz0H5sWjWgrVgTMxM4qFLwM/vmlWTDu8bl1stVNQHE1+dH0WdbZGiRNtzqlysDPAFTql78AOa00Dq6GdqrH4oyzwXqx8bJsE/wk6KHloTMfZt4YB4rkrbstnZGfcU6DnaCBVhxiJU4uAmdalhsXXKnKNj/MavrZnM4R+GZg3BZGGA57bOQKMXVIn9gniPpCe+BwLrH8pL6ba2J/iZDx2BLpz5d9KrSnDEQa747j5rUlh5rKo9/jllTBp0jf1YukMRyKg0VI/9e8ExvFP4aRELYtQhLCfHIcLU10wJL6qxCpgEh5Wq/yX5dtDMTOFqogOb74qmJen4KWRVXIm32GVCdudx55GLibltOAwOC+Ui5eoLx8RBMXMWQBtrrx3a+p3b8eREuSxmFwM+99NIhTpcIdfikH79Qn0XGwwTQxrTRCzMK0=
